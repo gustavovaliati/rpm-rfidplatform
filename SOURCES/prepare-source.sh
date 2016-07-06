@@ -9,5 +9,7 @@ if [ ! -d "RFIDPlatformServerPreparationPackage-0.1/platform" ]; then
 	cd .. &&
 	tar -cf platform.tar platform/;
 fi
-cd $sourcesdir;
+cd $sourcesdir/RFIDPlatformServerPreparationPackage-0.1 &&
+tar -cf installation_resources.tar installation_resources/ && 
+cd $sourcesdir &&
 tar -cf RFIDPlatformServerPreparationPackage-0.1.tar RFIDPlatformServerPreparationPackage-0.1/;

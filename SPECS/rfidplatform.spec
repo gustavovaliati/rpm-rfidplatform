@@ -35,9 +35,8 @@ nothing yet
 
 %install
 mkdir -p %{buildroot}%{finaldir};
-install -m 755 prepare_ssl.sh %{buildroot}%{finaldir}
-install -m 755 prepare_startup.sh %{buildroot}%{finaldir}
 install -m 755 platform.tar %{buildroot}%{finaldir}
+install -m 755 installation_resources.tar %{buildroot}%{finaldir}
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
@@ -72,13 +71,7 @@ fi
 printf "Checking pm2... ";
 output=$(sudo su -c "env PATH=$PATH:/usr/local/bin pm2 -v" | tail -1); #GET LAST LINE ONLY
 if echo "$?" > dev/null ; then
-	expVersion="1.1.3";
-	if [ "$output" == "$expVersion" ]; then
-		echo "SUCCESS.";
-	else
-		echo "FAIL: Expected version $expVersion but version $output found.";
-		exit 1;
-	fi
+	echo "SUCCESS.";
         
 else
         echo "FAIL: Node package [pm2] probably not installed.";
@@ -99,33 +92,32 @@ else
         fi
 fi
 
-printf "Checking hability to give permissions to nodejs user for %{finaldir}...";
-if chown -R nodejs:users %{finaldir} > /dev/null 2>&1 ; then
-        echo "SUCCESS.";
-else
-        echo "FAIL.";
-        exit 1;
-fi
+#printf "Checking hability to give permissions to nodejs user for %{finaldir}...";
+#if chown -R nodejs:users %{finaldir} > /dev/null 2>&1 ; then
+#        echo "SUCCESS.";
+#else
+#        echo "FAIL.";
+#        exit 1;
+#fi
+
 %post
 printf "Decompressing platform source...";
 tar -xf %{finaldir}/platform.tar -C  %{finaldir} &&
 rm %{finaldir}/platform.tar &&
 echo "Done." &&
+printf "Decompressing installation resources...";
+tar -xf %{finaldir}/installation_resources.tar -C  %{finaldir} &&
+rm %{finaldir}/installation_resources.tar &&
+echo "Done." &&
 printf "Changing permissions to %{finaldir} ..."
 chown -R nodejs:users %{finaldir} &&
 echo "Done." &&
-printf "Executing script to create ssl cert files..." &&
-#%%{finaldir}/prepare_ssl.sh &&
-openssl genrsa -out /opt/rfidmonitor/platform/server/config/ssl/platform-key.pem 1024 &&
-openssl req -new -key /opt/rfidmonitor/platform/server/config/ssl/platform-key.pem -out /opt/rfidmonitor/platform/server/config/ssl/platform-cert-req.csr &&
-openssl x509 -req -in /opt/rfidmonitor/platform/server/config/ssl/platform-cert-req.csr -signkey /opt/rfidmonitor/platform/server/config/ssl/platform-key.pem -out /opt/rfidmonitor/platform/server/config/ssl/platform-cert.pem &&
-echo "Done." &&
-printf "Executing script to prepare pm2 to get the app online..." &&
-%{finaldir}/prepare_startup.sh &&
-echo "Done." &&
 printf "Deploying pm2 startup script..." &&
 sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup redhat -u nodejs --hp /home/nodejs" &&
-echo "Done." || 
+echo "Done." && 
+echo "The RPM package has been successfuly executed." &&
+echo "To finish the installation you must run the following script as nodejs user:" &&
+echo "%{finaldir}/installation_resources/install.sh" || 
 exit 1;
 
 
@@ -137,9 +129,8 @@ echo "test postun";
 
 %files
 %defattr(-,root,root)
-%attr(755,root,root) %{finaldir}/prepare_ssl.sh
-%attr(755,root,root) %{finaldir}/prepare_startup.sh
 %attr(755,root,root) %{finaldir}/platform.tar
+%attr(755,root,root) %{finaldir}/installation_resources.tar
 
 %changelog
 
