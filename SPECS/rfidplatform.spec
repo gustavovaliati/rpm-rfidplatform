@@ -113,7 +113,7 @@ printf "Changing permissions to %{finaldir} ..."
 chown -R nodejs:users %{finaldir} &&
 echo "Done." &&
 printf "Deploying pm2 startup script..." &&
-sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup redhat -u nodejs --hp /home/nodejs" &&
+sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup redhat -u nodejs --hp /home/nodejs > /dev/null 2>&1" &&
 echo "Done." && 
 echo "The RPM package has been successfuly executed." &&
 echo "To finish the installation you must run the following script as nodejs user:" &&
