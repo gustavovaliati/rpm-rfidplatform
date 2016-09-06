@@ -16,11 +16,10 @@ Packager:	Gustavo Valiati <gustavovaliati@gmail.com>
 Source:		RFIDPlatformServerPreparationPackage-0.1.tar
 Prefix:		%{_prefix}
 #BuildRequires:	?
-Requires:	/bin/bash /bin/sh
+#Requires:	?
 Buildroot:	%{buildroot}
 ExclusiveArch:	x86_64
 Exclusiveos:	Linux
-AutoReqProv: no
 
 
 %description
@@ -36,12 +35,8 @@ nothing yet
 
 %install
 mkdir -p %{buildroot}%{finaldir};
-tar -xf platform.tar -C %{buildroot};
-tar -xf installation_resources.tar -C %{buildroot}
-cp -a %{buildroot}/platform %{buildroot}%{finaldir}
-cp -a %{buildroot}/installation_resources %{buildroot}%{finaldir}
-rm -rf %{buildroot}/platform;
-rm -rf %{buildroot}/installation_resources;
+install -m 755 platform.tar %{buildroot}%{finaldir}
+install -m 755 installation_resources.tar %{buildroot}%{finaldir}
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
@@ -97,20 +92,34 @@ else
         fi
 fi
 
-%post
+#printf "Checking hability to give permissions to nodejs user for %{finaldir}...";
+#if chown -R nodejs:users %{finaldir} > /dev/null 2>&1 ; then
+#        echo "SUCCESS.";
+#else
+#        echo "FAIL.";
+#        exit 1;
+#fi
 
+%post
+printf "Decompressing platform source...";
+tar -xf %{finaldir}/platform.tar -C  %{finaldir} &&
+rm %{finaldir}/platform.tar &&
+echo "Done." &&
+printf "Decompressing installation resources...";
+tar -xf %{finaldir}/installation_resources.tar -C  %{finaldir} &&
+rm %{finaldir}/installation_resources.tar &&
+echo "Done." &&
 printf "Changing permissions to %{finaldir} ..."
 chown -R nodejs:users %{finaldir} &&
 echo "Done." &&
 printf "Deploying pm2 startup script..." &&
 sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup redhat -u nodejs --hp /home/nodejs > /dev/null 2>&1" &&
-echo "Done." &&
-echo "Package installation... Done." &&
-printf "\n" &&
-echo "Now run the following script as nodejs user:" &&
-echo "%{finaldir}/installation_resources/install.sh" &&
-printf "\n" || 
+echo "Done." && 
+echo "The RPM package has been successfuly executed." &&
+echo "To finish the installation you must run the following script as nodejs user:" &&
+echo "%{finaldir}/installation_resources/install.sh" || 
 exit 1;
+
 
 %preun
 echo "test preun";
@@ -119,8 +128,9 @@ echo "test preun";
 echo "test postun";
 
 %files
-%{finaldir}
+%defattr(-,root,root)
+%attr(755,root,root) %{finaldir}/platform.tar
+%attr(755,root,root) %{finaldir}/installation_resources.tar
 
 %changelog
-* Mon Sep 05 2016 Gustavo Valiati <gustavovaliati@gmail.com> v1.0
-- Initial release.
+

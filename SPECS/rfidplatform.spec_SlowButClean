@@ -97,8 +97,23 @@ else
         fi
 fi
 
-%post
+#printf "Checking hability to give permissions to nodejs user for %{finaldir}...";
+#if chown -R nodejs:users %{finaldir} > /dev/null 2>&1 ; then
+#        echo "SUCCESS.";
+#else
+#        echo "FAIL.";
+#        exit 1;
+#fi
 
+%post
+#printf "Decompressing platform source...";
+#tar -xf %{finaldir}/platform.tar -C  %{finaldir} &&
+#rm %{finaldir}/platform.tar &&
+#echo "Done." &&
+#printf "Decompressing installation resources...";
+#tar -xf %{finaldir}/installation_resources.tar -C  %{finaldir} &&
+#rm %{finaldir}/installation_resources.tar &&
+#echo "Done." &&
 printf "Changing permissions to %{finaldir} ..."
 chown -R nodejs:users %{finaldir} &&
 echo "Done." &&
@@ -112,6 +127,7 @@ echo "%{finaldir}/installation_resources/install.sh" &&
 printf "\n" || 
 exit 1;
 
+
 %preun
 echo "test preun";
 
@@ -119,7 +135,12 @@ echo "test preun";
 echo "test postun";
 
 %files
+#%dir %{finaldir}
 %{finaldir}
+#%defattr(-,root,root)
+#%attr(755,root,root) %{finaldir}
+#%attr(755,root,root) %{finaldir}/platform.tar
+#%attr(755,root,root) %{finaldir}/installation_resources.tar
 
 %changelog
 * Mon Sep 05 2016 Gustavo Valiati <gustavovaliati@gmail.com> v1.0
