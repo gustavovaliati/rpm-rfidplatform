@@ -37,9 +37,9 @@ nothing yet
 %install
 mkdir -p %{buildroot}%{finaldir};
 tar -xf platform.tar -C %{buildroot};
-tar -xf installation_resources.tar -C %{buildroot}
-cp -a %{buildroot}/platform %{buildroot}%{finaldir}
-cp -a %{buildroot}/installation_resources %{buildroot}%{finaldir}
+tar -xf installation_resources.tar -C %{buildroot};
+cp -a %{buildroot}/platform %{buildroot}%{finaldir};
+cp -a %{buildroot}/installation_resources %{buildroot}%{finaldir};
 rm -rf %{buildroot}/platform;
 rm -rf %{buildroot}/installation_resources;
 
@@ -113,7 +113,29 @@ printf "\n" ||
 exit 1;
 
 %preun
-echo "test preun";
+echo "Uninstalling package...";
+echo "1) The bynaries required for the installation are not going to be uninstalled by this process.";
+echo "2) The application files are going to be removed, but any new or modified file will be kept.";
+
+if [ "$(whoami)" == "nodejs" ]; then
+	printf "Stopping server and removing from startup... " ; 
+	pm2 stop rfidplatform > /dev/null 2>&1 ;
+	pm2 delete rfidplatform > /dev/null 2>&1 ;
+	pm2 save > /dev/null 2>&1 ;
+	echo "Done.";
+else
+	if sudo -v > /dev/null 2>&1; then
+                echo "User: not nodejs. Using 'runuser' ";
+		printf "Stopping server and removing from startup... " ;
+                sudo runuser -l nodejs -c 'pm2 stop rfidplatform > /dev/null 2>&1' ;
+		sudo runuser -l nodejs -c 'pm2 delete rfidplatform > /dev/null 2>&1' ;
+		sudo runuser -l nodejs -c 'pm2 save > /dev/null 2>&1' ;
+                echo "Done."; 
+	else
+                echo "Failed to use 'sudo' . Does the current user have 'sudo' permissions? Did you type its password too many times wrong? Switch to user 'nodejs' that not requires sudo, or get sudoers permission for the current user.";
+                exit 1;
+        fi
+fi
 
 %postun
 echo "test postun";
