@@ -16,7 +16,9 @@ Packager:	Gustavo Valiati <gustavovaliati@gmail.com>
 Source:		RFIDPlatformServerPreparationPackage-0.1.tar
 Prefix:		%{_prefix}
 #BuildRequires:	?
-Requires:	/bin/bash /bin/sh
+Requires:	/bin/bash, /bin/sh
+#Requires: /usr/local/bin/node
+#Requires:	/bin/bash, /bin/sh, /bin/node
 Buildroot:	%{buildroot}
 ExclusiveArch:	x86_64
 Exclusiveos:	Linux
@@ -46,10 +48,14 @@ rm -rf %{buildroot}/installation_resources;
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
+#%verifyscript
+#Does not work.
+
 %pre
+
 printf "Checking node... ";
-output=$(sudo su -c "env PATH=$PATH:/usr/local/bin node -v");
-if echo "$?" > dev/null ; then
+output=$(sudo su -c "/usr/bin/env PATH=$PATH:/usr/local/bin node -v");
+if [ -n "$output" ]; then
 	expVersion="v4.4.0";
 	if [ "$output" == "$expVersion" ]; then
 		echo "SUCCESS.";
@@ -65,22 +71,21 @@ fi
 
 printf "Checking npm... ";
 output=$(sudo su -c "env PATH=$PATH:/usr/local/bin npm -v");
-if echo "$?" > dev/null ; then
-	echo "SUCCESS.";
-        
+if [ -n "$output" ] ; then
+        echo "SUCCESS.";
+
 else
         echo "FAIL: Node probably not installed.";
-	exit 1;
+        exit 1;
 fi
 
 printf "Checking pm2... ";
 output=$(sudo su -c "env PATH=$PATH:/usr/local/bin pm2 -v" | tail -1); #GET LAST LINE ONLY
-if echo "$?" > dev/null ; then
-	echo "SUCCESS.";
-        
+if [ -n "$output" ] ; then
+        echo "SUCCESS.";
 else
         echo "FAIL: Node package [pm2] probably not installed.";
-	exit 1;
+        exit 1;
 fi
 
 
