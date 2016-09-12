@@ -38,69 +38,33 @@ nothing yet
 
 %install
 mkdir -p %{buildroot}%{finaldir};
-tar -xf platform.tar -C %{buildroot};
-tar -xf installation_resources.tar -C %{buildroot};
-cp -a %{buildroot}/platform %{buildroot}%{finaldir};
-cp -a %{buildroot}/installation_resources %{buildroot}%{finaldir};
-rm -rf %{buildroot}/platform;
-rm -rf %{buildroot}/installation_resources;
+mkdir -p %{buildroot}/usr/local/;
+tar -xf node-v4.4.0-linux-x64.tar.gz -C %{buildroot}/usr/local/ --strip 1;
+rm %{buildroot}/usr/local/LICENSE ;
+rm %{buildroot}/usr/local/README.md ;
+rm %{buildroot}/usr/local/CHANGELOG.md ;
+
+tar -xf pm2.tar -C %{buildroot};
+tar -xf platform.tar -C %{buildroot}%{finaldir};
+tar -xf installation_resources.tar -C %{buildroot}%{finaldir};
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
-#%verifyscript
-#Does not work.
-
 %pre
 
-printf "Checking node... ";
-output=$(sudo su -c "/usr/bin/env PATH=$PATH:/usr/local/bin node -v");
-if [ -n "$output" ]; then
-	expVersion="v4.4.0";
-	if [ "$output" == "$expVersion" ]; then
-		echo "SUCCESS.";
-	else
-		echo "FAIL: Expected version $expVersion but version $output found.";
-		exit 1;
-	fi
-        
-else
-        echo "FAIL: Node probably not installed.";
-	exit 1;
-fi
+# Open TCP port 80, 443, 8124;
+firewall-cmd --add-port=443/tcp --permanent;
+firewall-cmd --add-port=80/tcp --permanent;
+firewall-cmd --add-port=8124/tcp --permanent;
 
-printf "Checking npm... ";
-output=$(sudo su -c "env PATH=$PATH:/usr/local/bin npm -v");
-if [ -n "$output" ] ; then
-        echo "SUCCESS.";
+# Redirect port 80 to 8180 and Redirect port 443 to 8143;
+firewall-cmd --add-forward-port=port=443:proto=tcp:toport=8143 --permanent;
+firewall-cmd --add-forward-port=port=80:proto=tcp:toport=8180 --permanent;
+firewall-cmd --reload;
 
-else
-        echo "FAIL: Node probably not installed.";
-        exit 1;
-fi
-
-printf "Checking pm2... ";
-output=$(sudo su -c "env PATH=$PATH:/usr/local/bin pm2 -v" | tail -1); #GET LAST LINE ONLY
-if [ -n "$output" ] ; then
-        echo "SUCCESS.";
-else
-        echo "FAIL: Node package [pm2] probably not installed.";
-        exit 1;
-fi
-
-
-printf "Checking user [nodejs]...";
-if getent passwd nodejs > /dev/null 2>&1 ; then
-        echo "SUCCESS: user already created."
-else
-	printf "Creating..."
-        if adduser nodejs -g users --system --home-dir /home/nodejs && mkdir /home/nodejs && chown -R nodejs:users /home/nodejs > /dev/null 2>&1 ; then
-                echo "SUCCESS: user has been created.";
-        else
-                echo "FAIL: failed while creating user [nodejs]";
-                exit 1;
-        fi
-fi
+# Create nodejs user;
+adduser nodejs -g users;
 
 %post
 
@@ -113,14 +77,20 @@ echo "Done." &&
 echo "Package installation... Done." &&
 printf "\n" &&
 echo "Now run the following script as nodejs user:" &&
-echo "%{finaldir}/installation_resources/install.sh" &&
+echo "%{finaldir}/installation_resources/prepare.sh" &&
 printf "\n" || 
 exit 1;
 
 %preun
 echo "Uninstalling package...";
-echo "1) The bynaries required for the installation are not going to be uninstalled by this process.";
-echo "2) The application files are going to be removed, but any new or modified file will be kept.";
+
+echo "Closing firewall ports...";
+firewall-cmd --remove-port=443/tcp --permanent;
+firewall-cmd --remove-port=80/tcp --permanent;
+firewall-cmd --remove-port=8124/tcp --permanent;
+firewall-cmd --remove-forward-port=port=443:proto=tcp:toport=8143 --permanent;
+firewall-cmd --remove-forward-port=port=80:proto=tcp:toport=8180 --permanent;
+firewall-cmd --reload;
 
 if [ "$(whoami)" == "nodejs" ]; then
 	printf "Stopping server and removing from startup... " ; 
@@ -143,10 +113,18 @@ else
 fi
 
 %postun
-echo "test postun";
+echo "The nodejs user was not removed purposely.";
+echo "The new or modified files were not removed.";
 
 %files
 %{finaldir}
+/usr/local/bin/npm
+/usr/local/bin/node
+/usr/local/share/man/man1/node.1
+/usr/local/share/systemtap/tapset/node.stp
+/usr/local/share/doc/node/
+/usr/local/include/node/
+/usr/local/lib/node_modules/
 
 %changelog
 * Mon Sep 05 2016 Gustavo Valiati <gustavovaliati@gmail.com> v1.0

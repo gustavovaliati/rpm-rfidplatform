@@ -1,0 +1,5 @@
+Run prepare.sh to:
+* Check the DB config file;
+* Check SSL files;
+* Config the app startup;
+* Execute a small selfttest;
