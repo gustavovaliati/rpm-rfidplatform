@@ -1,5 +1,12 @@
 # rpm-rfidplatform
 
+## Requirements
+
+* Internet connection;
+* Git;
+* rpmbuild package;
+* O.S.: Redhat 7
+
 ## Building the RPM package
 
 1. Do not use the 'root' user in the building process;
