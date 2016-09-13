@@ -4,5 +4,6 @@ if [ "$(whoami)" == "root" ]; then
 	exit 1;
 fi
 
+echo "Processing source... ";
 /usr/src/redhat/SOURCES/prepare-source.sh &&
 rpmbuild -ba /usr/src/redhat/SPECS/rfidplatform.spec;

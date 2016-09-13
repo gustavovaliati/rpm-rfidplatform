@@ -133,6 +133,8 @@ echo "UNINSTALL FINISHED.";
 
 %files
 %{finaldir}
+/usr/local/bin/pm2
+/usr/local/bin/pm2-dev
 /usr/local/bin/npm
 /usr/local/bin/node
 /usr/local/share/man/man1/node.1
