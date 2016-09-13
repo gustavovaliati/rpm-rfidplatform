@@ -15,7 +15,9 @@ if [ "$(whoami)" != "nodejs" ]; then
         exit 1;
 fi
 
-echo "--- DB CONFIG";
+echo "--------------------------------------";
+echo " DB CONFIG";
+echo "--------------------------------------";
 
 echo "Be sure your DB config file is containing the correct access information.";
 echo "File: $dbAppConfigFile";
@@ -38,7 +40,9 @@ while true; do
     esac
 done
 
-echo "--- SSL CONFIG";
+echo "--------------------------------------";
+echo "SSL CONFIG";
+echo "--------------------------------------";
 echo "Checking the if ssl files are present;"
 	for sslFile in $sslFiles
 	do
@@ -65,8 +69,10 @@ echo "Checking the if ssl files are present;"
     			esac
 		done
 	fi
-
-echo "--- APP STARTUP CONFIG";
+  
+echo "--------------------------------------";
+echo "APP STARTUP CONFIG";
+echo "--------------------------------------";
 #multi core
 	#pm2 start /opt/rfidmonitor/platform/app.js --name "rfidplatform" -i 0;
 
@@ -79,17 +85,26 @@ echo "--- APP STARTUP CONFIG";
 	pm2 save &&
 	echo "Done." ;
 
+echo "--------------------------------------";
 echo "--- SELFTEST"
+echo "--------------------------------------";
 
-printf "Checking https://localhost:8143... ";
+printf "Checking 'https://localhost:8143' ";
 
-if curl --insecure https://localhost:8143/ > /dev/null 2>&1 ; then
-        echo "OK.";
-else
-        echo "ERROR. Curl code: $?";
-        echo "Selftest failed: The app is not completely online. Please check the app logs using 'pm2 logs' as nodejs user.";
-        exit 1;
-fi
+tries_counter=0;
+while ! curl --insecure https://localhost:8143/ > /dev/null 2>&1 ; do
+        printf ".";
+        tries_counter=$((tries_counter+1));
+        if [[ "$tries_counter" -gt 5 ]]; then
+                printf "\n";
+                echo "Selftest failed: The app is not completely online. Please check the app logs using 'pm2 logs' as nodejs user.";
+                exit 1;
+        fi
+        sleep 2;
+done;
 
+echo "[OK]";
 
-echo "--- THE APPLICATION IS READY TO USE."
+echo "--------------------------------------";
+echo "THE APPLICATION IS READY TO USE."
+echo "--------------------------------------";

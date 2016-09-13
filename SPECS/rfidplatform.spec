@@ -54,17 +54,24 @@ tar -xf installation_resources.tar -C %{buildroot}%{finaldir};
 %pre
 
 # Open TCP port 80, 443, 8124;
+printf "Firewall - opening port 443/tcp: ";
 firewall-cmd --add-port=443/tcp --permanent;
+printf "Firewall - opening port 80/tcp: ";
 firewall-cmd --add-port=80/tcp --permanent;
+printf "Firewall - opening port 8124/tcp: ";
 firewall-cmd --add-port=8124/tcp --permanent;
 
 # Redirect port 80 to 8180 and Redirect port 443 to 8143;
+printf "Firewall - redirecting port 443/tcp to 8143: ";
 firewall-cmd --add-forward-port=port=443:proto=tcp:toport=8143 --permanent;
+printf "Firewall - redirecting port 80/tcp to 8180: ";
 firewall-cmd --add-forward-port=port=80:proto=tcp:toport=8180 --permanent;
+printf "Firewall - reloading: ";
 firewall-cmd --reload;
 
 # Create nodejs user;
-adduser nodejs -g users;
+printf "Creating 'nodejs' user: ";
+adduser nodejs -g users || true ;
 
 %post
 
@@ -76,8 +83,8 @@ sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup redhat -u nodejs --hp /hom
 echo "Done." &&
 echo "Package installation... Done." &&
 printf "\n" &&
-echo "Now run the following script as nodejs user:" &&
-echo "%{finaldir}/installation_resources/prepare.sh" &&
+echo "[ ! ] Now run the following script as nodejs user:" &&
+echo "      %{finaldir}/installation_resources/prepare.sh" &&
 printf "\n" || 
 exit 1;
 
@@ -85,11 +92,17 @@ exit 1;
 echo "Uninstalling package...";
 
 echo "Closing firewall ports...";
+printf "Firewall - closing port 443/tcp: ";
 firewall-cmd --remove-port=443/tcp --permanent;
+printf "Firewall - closing port 80/tcp: ";
 firewall-cmd --remove-port=80/tcp --permanent;
+printf "Firewall - closing port 8124/tcp: ";
 firewall-cmd --remove-port=8124/tcp --permanent;
+printf "Firewall - removing redirection from port 443/tcp to 8143: ";
 firewall-cmd --remove-forward-port=port=443:proto=tcp:toport=8143 --permanent;
+printf "Firewall - removing redirection from port 80/tcp to 8180: ";
 firewall-cmd --remove-forward-port=port=80:proto=tcp:toport=8180 --permanent;
+printf "Firewall - reloading: ";
 firewall-cmd --reload;
 
 if [ "$(whoami)" == "nodejs" ]; then
@@ -113,8 +126,10 @@ else
 fi
 
 %postun
+echo "[ ! ] WARNING"
 echo "The nodejs user was not removed purposely.";
-echo "The new or modified files were not removed.";
+echo "The new or modified files were not removed. Check %{finaldir}";
+echo "UNINSTALL FINISHED.";
 
 %files
 %{finaldir}
