@@ -24,7 +24,7 @@ echo "File: $dbAppConfigFile";
 printf "\n";
 
 while true; do
-    read -p "Is your DB configuration file OK?" yn
+    read -p "Is your DB configuration file OK? [y/n] " yn
     case $yn in
         [Yy]* )
 		if  /usr/local/bin/node $appDir/test/dbCheck.js ;then
@@ -57,7 +57,7 @@ echo "Checking the if ssl files are present;"
 
 	if [[ "$missingSsl" == true ]] ;then
 		while true; do
-    			read -p "There are one or more missing ssl files. Do you want help to regenerate all ssl files?" yn
+    			read -p "There are one or more missing ssl files. Do you want help to regenerate all ssl files? [y/n] " yn
     			case $yn in
         		[Yy]* )
 				openssl genrsa -out $sslAppDir/platform-key.pem 1024 &&

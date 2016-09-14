@@ -9,16 +9,12 @@ Release:	1
 Summary:	Monitoring Platform - ITAIPU's DAM Piracema channel use case.
 Group:		Applications/System
 License:	GPLv3
-URL:		www.celtab.org.br
 Vendor:		CELTAB celtab@pti.org.br
 Packager:	Gustavo Valiati <gustavovaliati@gmail.com>
-#Source:		https://github.com/CELTAB/rpm-rfidplatform.git
 Source:		RFIDPlatformServerPreparationPackage-0.1.tar
+URL:		https://github.com/CELTAB/rpm-rfidplatform.git
 Prefix:		%{_prefix}
-#BuildRequires:	?
 Requires:	/bin/bash, /bin/sh
-#Requires: /usr/local/bin/node
-#Requires:	/bin/bash, /bin/sh, /bin/node
 Buildroot:	%{buildroot}
 ExclusiveArch:	x86_64
 Exclusiveos:	Linux
@@ -26,8 +22,14 @@ AutoReqProv: no
 
 
 %description
-nothing yet
-#TODO
+
+RFIDPlatformServerPreparationPackage is able to prepare the server side
+application for the RFIDMonitor project. After installing the package,
+the Monitoring Platform will be online, ready to interact with the database
+server and the Collecting Points, receiving and processing the RFID data.
+The package comes with nodejs, pm2 and a post-install script to help in
+the configuration of database connection, ssl certs, and a small self test.
+Be aware it does not include the database server.
 
 %prep
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
