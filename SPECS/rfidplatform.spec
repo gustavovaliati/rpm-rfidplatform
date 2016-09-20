@@ -56,20 +56,20 @@ tar -xf installation_resources.tar -C %{buildroot}%{finaldir};
 %pre
 
 # Open TCP port 80, 443, 8124;
-printf "Firewall - opening port 443/tcp: ";
-firewall-cmd --add-port=443/tcp --permanent;
-printf "Firewall - opening port 80/tcp: ";
-firewall-cmd --add-port=80/tcp --permanent;
-printf "Firewall - opening port 8124/tcp: ";
-firewall-cmd --add-port=8124/tcp --permanent;
+#printf "Firewall - opening port 443/tcp: ";
+#firewall-cmd --add-port=443/tcp --permanent;
+#printf "Firewall - opening port 80/tcp: ";
+#firewall-cmd --add-port=80/tcp --permanent;
+#printf "Firewall - opening port 8124/tcp: ";
+#firewall-cmd --add-port=8124/tcp --permanent;
 
 # Redirect port 80 to 8180 and Redirect port 443 to 8143;
-printf "Firewall - redirecting port 443/tcp to 8143: ";
-firewall-cmd --add-forward-port=port=443:proto=tcp:toport=8143 --permanent;
-printf "Firewall - redirecting port 80/tcp to 8180: ";
-firewall-cmd --add-forward-port=port=80:proto=tcp:toport=8180 --permanent;
-printf "Firewall - reloading: ";
-firewall-cmd --reload;
+#printf "Firewall - redirecting port 443/tcp to 8143: ";
+#firewall-cmd --add-forward-port=port=443:proto=tcp:toport=8143 --permanent;
+#printf "Firewall - redirecting port 80/tcp to 8180: ";
+#firewall-cmd --add-forward-port=port=80:proto=tcp:toport=8180 --permanent;
+#printf "Firewall - reloading: ";
+#firewall-cmd --reload;
 
 # Create nodejs user;
 printf "Creating 'nodejs' user: ";
@@ -93,19 +93,19 @@ exit 1;
 %preun
 echo "Uninstalling package...";
 
-echo "Closing firewall ports...";
-printf "Firewall - closing port 443/tcp: ";
-firewall-cmd --remove-port=443/tcp --permanent;
-printf "Firewall - closing port 80/tcp: ";
-firewall-cmd --remove-port=80/tcp --permanent;
-printf "Firewall - closing port 8124/tcp: ";
-firewall-cmd --remove-port=8124/tcp --permanent;
-printf "Firewall - removing redirection from port 443/tcp to 8143: ";
-firewall-cmd --remove-forward-port=port=443:proto=tcp:toport=8143 --permanent;
-printf "Firewall - removing redirection from port 80/tcp to 8180: ";
-firewall-cmd --remove-forward-port=port=80:proto=tcp:toport=8180 --permanent;
-printf "Firewall - reloading: ";
-firewall-cmd --reload;
+#echo "Closing firewall ports...";
+#printf "Firewall - closing port 443/tcp: ";
+#firewall-cmd --remove-port=443/tcp --permanent;
+#printf "Firewall - closing port 80/tcp: ";
+#firewall-cmd --remove-port=80/tcp --permanent;
+#printf "Firewall - closing port 8124/tcp: ";
+#firewall-cmd --remove-port=8124/tcp --permanent;
+#printf "Firewall - removing redirection from port 443/tcp to 8143: ";
+#firewall-cmd --remove-forward-port=port=443:proto=tcp:toport=8143 --permanent;
+#printf "Firewall - removing redirection from port 80/tcp to 8180: ";
+#firewall-cmd --remove-forward-port=port=80:proto=tcp:toport=8180 --permanent;
+#printf "Firewall - reloading: ";
+#firewall-cmd --reload;
 
 if [ "$(whoami)" == "nodejs" ]; then
 	printf "Stopping server and removing from startup... " ; 
@@ -114,7 +114,7 @@ if [ "$(whoami)" == "nodejs" ]; then
 	pm2 save > /dev/null 2>&1 ;
 	echo "Done.";
 else
-	if sudo -v > /dev/null 2>&1; then
+		if sudo -v > /dev/null 2>&1; then
                 echo "User: not nodejs. Using 'runuser' ";
 		printf "Stopping server and removing from startup... " ;
                 sudo runuser -l nodejs -c 'pm2 stop rfidplatform > /dev/null 2>&1' ;
