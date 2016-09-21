@@ -3,7 +3,7 @@
 %define finaldir	/opt/rfidmonitor
 %define buildroot	%{_tmppath}/%{name}-%{version}-root
 
-Name: 		RFIDPlatformServerPreparationPackage
+Name:		rfidmonitor-server
 Version:	0.1
 Release:	1
 Summary:	Monitoring Platform - ITAIPU's DAM Piracema channel use case.
@@ -11,7 +11,7 @@ Group:		Applications/System
 License:	GPLv3
 Vendor:		CELTAB celtab@pti.org.br
 Packager:	Gustavo Valiati <gustavovaliati@gmail.com>
-Source:		RFIDPlatformServerPreparationPackage-0.1.tar
+Source:		rfidmonitor-server-0.1.tar
 URL:		https://github.com/CELTAB/rpm-rfidplatform.git
 Prefix:		%{_prefix}
 Requires:	/bin/bash, /bin/sh
@@ -23,7 +23,7 @@ AutoReqProv: no
 
 %description
 
-RFIDPlatformServerPreparationPackage is able to prepare the server side
+The rfidmonitor-server package is able to prepare the server side
 application for the RFIDMonitor project. After installing the package,
 the Monitoring Platform will be online, ready to interact with the database
 server and the Collecting Points, receiving and processing the RFID data.

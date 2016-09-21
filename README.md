@@ -1,10 +1,10 @@
-# rpm-rfidplatform - RFIDPlatformServerPreparationPackage
+# rpm-rfidplatform - rfidmonitor-server
 
 ## Intro
 
-This is a source to build a rpm package (RFIDPlatformServerPreparationPackage | temporary name) using the rpmbuild tool.
+This is a source to build a rpm package (rfidmonitor-server | temporary name) using the rpmbuild tool.
 
-RFIDPlatformServerPreparationPackage is able to prepare the server side
+rfidmonitor-server is able to prepare the server side
 application for the RFIDMonitor project. After installing the package,
 the Monitoring Platform will be online, ready to interact with the database
 server and the Collecting Points, receiving and processing the RFID data.
@@ -73,7 +73,7 @@ $ ./build.sh;
 > The package creates the nodejs user to use it as the app manager. Also create the folders under /opt/rfidmonitor and extract all app files into it, giving the 'nodejs' user the owndership.
 
 ```sh
-# rpm -ivh RFIDPlatformServerPreparationPackage-0.1-1.x86_64.rpm
+# rpm -ivh rfidmonitor-server-0.1-1.x86_64.rpm
 ```
 
 4. Configuring the app before the first start:
@@ -124,7 +124,7 @@ To uninstall the application, just run:
 > This default uninstall process will stop the application, remove from initialization, and remove every file that have been installed by the package previously, but any new file created by the user in the package structure, such as logs, ssl files, uploaded files. Modified files as configuration files will be removed.
 
 ```sh
-# rpm -e RFIDPlatformServerPreparationPackage-0.1-1.x86_64
+# rpm -e rfidmonitor-server-0.1-1.x86_64
 ```
 
 Be aware that, manually, firewall ports must be closed and the 'nodejs' user should be removed. To revert the firewall configuration done in the installation section, execute:
@@ -165,7 +165,7 @@ $ pm2 [stop or start or restart] rfidplatform
 ## External software
 
 This source downloads and packages 'Node.js' and 'PM2' in a rpm file. Each of them have
-their own documentation and licenses. The RFIDPlatformServerPreparationPackage does not
+their own documentation and licenses. The rfidmonitor-server does not
 change rights or terms of 'Node.js' or 'PM2'. Any doubts about these external softwares
 should checked in:
 * Nodejs <https://github.com/nodejs>;
