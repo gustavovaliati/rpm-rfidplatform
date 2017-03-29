@@ -41,6 +41,10 @@ $ ./build.sh;
 
 > The script will download the Node.js v4.4.0 bynaries and the 'rfidplatform' application. Then will download and install the application package.json dependencies, and compress everything in a tar file. By the end the script executes the rpmbuild tool, running the spec file over the sources.
 
+## Signing the package
+
+If you need to sign your package, please check [this tutorial](sign-rpm.md).
+
 ## Installing the package
 
 ### Requirements
